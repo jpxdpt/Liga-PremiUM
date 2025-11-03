@@ -3,12 +3,13 @@ FROM node:20-alpine AS base
 
 # Instalar dependências apenas quando necessário
 FROM base AS deps
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat python3 make g++
 WORKDIR /app
 
 # Copiar ficheiros de dependências
 COPY package.json package-lock.json* ./
-RUN npm ci
+# Instalar dependências (usar install se ci falhar)
+RUN npm ci || npm install
 
 # Reconstruir código fonte apenas quando necessário
 FROM base AS builder
