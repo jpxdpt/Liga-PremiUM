@@ -56,13 +56,22 @@ LOCALTUNNEL_SUBDOMAIN=liga-premium
    - Auto-update: Ative se quiser atualizações automáticas
 
 4. **Configurar Variáveis de Ambiente**
-   - Clique em **Environment variables**
-   - Adicione todas as variáveis do ficheiro `.env`
-   - Ou use o ficheiro `.env` diretamente
+   - ⚠️ **IMPORTANTE**: As variáveis `NEXT_PUBLIC_*` precisam estar configuradas!
+   - No Portainer, clique em **Environment variables** (ou use o ficheiro `.env`)
+   - Adicione todas as variáveis do ficheiro `.env`:
+     - `NEXT_PUBLIC_FIREBASE_API_KEY`
+     - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
+     - `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
+     - `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
+     - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
+     - `NEXT_PUBLIC_FIREBASE_APP_ID`
+     - `LOCALTUNNEL_SUBDOMAIN` (opcional)
+   - Estas variáveis serão passadas como **build arguments** e **environment variables**
 
 5. **Deploy**
    - Clique em **Deploy the stack**
-   - Aguarde o build e início dos containers
+   - ⚠️ O build pode demorar alguns minutos na primeira vez
+   - Aguarde o build completar e os containers iniciarem
 
 ### 2.2 Opção B: Build Manual com Dockerfile
 
@@ -175,7 +184,10 @@ O LocalTunnel já fornece HTTPS automaticamente. Se precisar de HTTPS próprio:
    ```
 
 2. **Verificar Variáveis de Ambiente**
-   - Certifique-se de que todas as variáveis `NEXT_PUBLIC_*` estão configuradas
+   - ⚠️ **CRÍTICO**: Certifique-se de que todas as variáveis `NEXT_PUBLIC_*` estão configuradas no Portainer
+   - As variáveis `NEXT_PUBLIC_*` são necessárias durante o **build**, não apenas no runtime
+   - No Portainer, verifique se as variáveis estão em **Environment variables** na configuração da stack
+   - Se não estiverem configuradas, o build falhará ou a app não funcionará (erro "API Key not valid")
 
 ### LocalTunnel não funciona
 
