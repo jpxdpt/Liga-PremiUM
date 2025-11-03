@@ -38,12 +38,17 @@ services:
     restart: unless-stopped
     entrypoint: /bin/sh
     command: >
-      -c "npm install -g localtunnel &&
-          sleep 10 &&
+      -c "npm install -g localtunnel@latest &&
+          echo 'LocalTunnel instalado. Aguardando aplicação estar pronta...' &&
+          sleep 15 &&
+          echo 'Iniciando tunnel...' &&
           if [ -n \"$$LOCALTUNNEL_SUBDOMAIN\" ]; then
-            lt --port 3000 --host liga-premium --subdomain $$LOCALTUNNEL_SUBDOMAIN || lt --port 3000 --host liga-premium
+            echo 'Tentando criar tunnel com subdomínio: '$$LOCALTUNNEL_SUBDOMAIN &&
+            lt --port 3000 --host liga-premium --subdomain $$LOCALTUNNEL_SUBDOMAIN 2>&1 ||
+            (echo 'Subdomínio não disponível, usando URL aleatório...' && lt --port 3000 --host liga-premium 2>&1)
           else
-            lt --port 3000 --host liga-premium
+            echo 'Criando tunnel com URL aleatório...' &&
+            lt --port 3000 --host liga-premium 2>&1
           fi"
     depends_on:
       liga-premium:
