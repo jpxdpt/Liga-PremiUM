@@ -39,16 +39,24 @@ services:
     entrypoint: /bin/sh
     command: >
       -c "npm install -g localtunnel@latest &&
-          echo 'LocalTunnel instalado. Aguardando aplicação estar pronta...' &&
-          sleep 15 &&
-          echo 'Iniciando tunnel...' &&
+          apk add --no-cache curl &&
+          echo 'LocalTunnel instalado. Testando conexão...' &&
+          sleep 20 &&
+          for i in 1 2 3 4 5 6; do
+            if curl -f http://liga-premium:3000/api/health > /dev/null 2>&1; then
+              echo 'Conexão OK! liga-premium está acessível.' &&
+              break
+            fi
+            echo 'Tentativa '$$i': Aguardando liga-premium...' &&
+            sleep 5
+          done &&
+          echo 'Iniciando LocalTunnel na porta 3000...' &&
           if [ -n \"$$LOCALTUNNEL_SUBDOMAIN\" ]; then
             echo 'Tentando criar tunnel com subdomínio: '$$LOCALTUNNEL_SUBDOMAIN &&
-            lt --port 3000 --host liga-premium --subdomain $$LOCALTUNNEL_SUBDOMAIN 2>&1 ||
-            (echo 'Subdomínio não disponível, usando URL aleatório...' && lt --port 3000 --host liga-premium 2>&1)
+            exec lt --port 3000 --host liga-premium --subdomain $$LOCALTUNNEL_SUBDOMAIN
           else
             echo 'Criando tunnel com URL aleatório...' &&
-            lt --port 3000 --host liga-premium 2>&1
+            exec lt --port 3000 --host liga-premium
           fi"
     depends_on:
       liga-premium:
