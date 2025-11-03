@@ -40,28 +40,23 @@ services:
     entrypoint: /bin/sh
     command: >
       -c "npm install -g localtunnel@latest &&
-          apk add --no-cache curl &&
-          echo 'LocalTunnel instalado. Aguardando aplicação estar pronta...' &&
+          echo 'LocalTunnel instalado. Aguardando aplicação...' &&
           sleep 30 &&
-          echo 'Testando aplicação em localhost:3000...' &&
+          echo 'Testando se aplicação está acessível em localhost:3000...' &&
+          apk add --no-cache curl &&
           until curl -f http://localhost:3000/api/health > /dev/null 2>&1; do
-            echo 'Aguardando aplicação iniciar...' &&
+            echo 'Aguardando aplicação...' &&
             sleep 5
           done &&
-          echo 'Aplicação está pronta! Iniciando LocalTunnel...' &&
+          echo 'Aplicação está pronta! Iniciando tunnel...' &&
           if [ -n \"$$LOCALTUNNEL_SUBDOMAIN\" ]; then
-            echo 'Tentando criar tunnel com subdomínio: '$$LOCALTUNNEL_SUBDOMAIN &&
-            timeout 15 lt --port 3000 --subdomain $$LOCALTUNNEL_SUBDOMAIN || 
-            (echo 'Subdomínio não disponível, usando URL aleatório...' && lt --port 3000)
+            echo 'Tentando subdomínio: '$$LOCALTUNNEL_SUBDOMAIN &&
+            timeout 10 lt --port 3000 --subdomain $$LOCALTUNNEL_SUBDOMAIN || 
+            (echo 'Subdomínio ocupado, usando URL aleatório...' && lt --port 3000)
           else
-            echo 'Criando tunnel com URL aleatório...' &&
+            echo 'Criando tunnel...' &&
             lt --port 3000
           fi"
-    depends_on:
-      liga-premium:
-        condition: service_healthy
-    environment:
-      - LOCALTUNNEL_SUBDOMAIN=${LOCALTUNNEL_SUBDOMAIN:-}
 
 networks:
   liga-network:
