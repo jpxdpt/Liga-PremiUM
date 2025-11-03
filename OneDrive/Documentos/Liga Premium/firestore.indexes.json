@@ -1,0 +1,52 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "cartas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "alunoId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "cartas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "turmaId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "cartas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "alunoId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "date",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
+

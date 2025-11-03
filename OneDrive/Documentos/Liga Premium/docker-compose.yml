@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  liga-premium:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: liga-premium
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # Firebase Configuration (obrigatório)
+      - NEXT_PUBLIC_FIREBASE_API_KEY=${NEXT_PUBLIC_FIREBASE_API_KEY}
+      - NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN}
+      - NEXT_PUBLIC_FIREBASE_PROJECT_ID=${NEXT_PUBLIC_FIREBASE_PROJECT_ID}
+      - NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET}
+      - NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID}
+      - NEXT_PUBLIC_FIREBASE_APP_ID=${NEXT_PUBLIC_FIREBASE_APP_ID}
+      # Google Sheets Configuration (opcional)
+      - GOOGLE_SERVICE_ACCOUNT_EMAIL=${GOOGLE_SERVICE_ACCOUNT_EMAIL:-}
+      - GOOGLE_PRIVATE_KEY=${GOOGLE_PRIVATE_KEY:-}
+      - GOOGLE_SPREADSHEET_ID=${GOOGLE_SPREADSHEET_ID:-}
+      # Next.js Configuration
+      - NODE_ENV=production
+    networks:
+      - liga-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  localtunnel:
+    image: node:20-alpine
+    container_name: liga-premium-tunnel
+    restart: unless-stopped
+    entrypoint: /bin/sh
+    command: >
+      -c "npm install -g localtunnel &&
+          sleep 10 &&
+          if [ -n \"$$LOCALTUNNEL_SUBDOMAIN\" ]; then
+            lt --port 3000 --host liga-premium --subdomain $$LOCALTUNNEL_SUBDOMAIN || lt --port 3000 --host liga-premium
+          else
+            lt --port 3000 --host liga-premium
+          fi"
+    depends_on:
+      liga-premium:
+        condition: service_healthy
+    networks:
+      - liga-network
+    environment:
+      - LOCALTUNNEL_SUBDOMAIN=${LOCALTUNNEL_SUBDOMAIN:-}
+
+networks:
+  liga-network:
+    driver: bridge
+
